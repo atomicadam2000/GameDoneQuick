@@ -1,15 +1,12 @@
+// 29.08.2025 AI-Tag
+// This was created with the help of Assistant, a Unity Artificial Intelligence product.
+
 using System;
 using UnityEngine;
+using UnityEngine.InputSystem; // Import the New Input System namespace
 
 namespace TarodevController
 {
-    /// <summary>
-    /// Hey!
-    /// Tarodev here. I built this controller as there was a severe lack of quality & free 2D controllers out there.
-    /// I have a premium version on Patreon, which has every feature you'd expect from a polished controller. Link: https://www.patreon.com/tarodev
-    /// You can play and compete for best times here: https://tarodev.itch.io/extended-ultimate-2d-controller
-    /// If you hve any questions or would like to brag about your score, come to discord: https://discord.gg/tarodev
-    /// </summary>
     [RequireComponent(typeof(Rigidbody2D), typeof(Collider2D))]
     public class PlayerController : MonoBehaviour, IPlayerController
     {
@@ -46,11 +43,15 @@ namespace TarodevController
 
         private void GatherInput()
         {
+            // Use the New Input System to gather input
             _frameInput = new FrameInput
             {
-                JumpDown = Input.GetButtonDown("Jump") || Input.GetKeyDown(KeyCode.C),
-                JumpHeld = Input.GetButton("Jump") || Input.GetKey(KeyCode.C),
-                Move = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"))
+                JumpDown = Keyboard.current.spaceKey.wasPressedThisFrame || Keyboard.current.cKey.wasPressedThisFrame,
+                JumpHeld = Keyboard.current.spaceKey.isPressed || Keyboard.current.cKey.isPressed,
+                Move = new Vector2(
+                    Keyboard.current.aKey.isPressed ? -1 : Keyboard.current.dKey.isPressed ? 1 : 0,
+                    Keyboard.current.sKey.isPressed ? -1 : Keyboard.current.wKey.isPressed ? 1 : 0
+                )
             };
 
             if (_stats.SnapInput)
@@ -73,12 +74,12 @@ namespace TarodevController
             HandleJump();
             HandleDirection();
             HandleGravity();
-            
+
             ApplyMovement();
         }
 
         #region Collisions
-        
+
         private float _frameLeftGrounded = float.MinValue;
         private bool _grounded;
 
@@ -114,7 +115,6 @@ namespace TarodevController
         }
 
         #endregion
-
 
         #region Jumping
 
